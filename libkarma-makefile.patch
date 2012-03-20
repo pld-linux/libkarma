@@ -1,0 +1,156 @@
+--- libkarma-0.1.2/src/Makefile.pld	2011-03-26 10:23:43.000000000 +0100
++++ libkarma-0.1.2/src/Makefile	2012-03-20 16:39:09.039518468 +0100
+@@ -6,7 +6,8 @@ SRCS= errors.c fdb.c hash.c karma.c karm
+ 	util.c wav.c
+ INST_HEADERS=lkarma.h utf8.h
+ 
+-LIBDIR=../lib
++LIBDIR=$(PREFIX)/lib
++PRIVLIBDIR=../lib
+ 
+ CC?=gcc
+ AR?=ar
+@@ -37,43 +38,43 @@ endif
+ default: all
+ 
+ install: shared-lib-stamp static-lib-stamp
+-	../install-sh -m 0755 -d $(DESTDIR)$(PREFIX)/lib
++	../install-sh -m 0755 -d $(DESTDIR)$(LIBDIR)
+ 	../install-sh -m 0755 -d $(DESTDIR)$(PREFIX)/include
+ 	../install-sh -m 0755 -d $(DESTDIR)$(PREFIX)/include/libkarma
+-	../install-sh -m 0644 -t $(DESTDIR)$(PREFIX)/lib/ $(LIBDIR)/$(TARGET).a
+-	../install-sh -m 0755 -t $(DESTDIR)$(PREFIX)/lib/ $(LIBDIR)/$(OUT_VERSION)
+-	$(RM) $(DESTDIR)$(PREFIX)/lib/$(OUT_MAJOR)
+-	$(RM) $(DESTDIR)$(PREFIX)/lib/$(OUT_BASE)
+-	$(LN_S) $(OUT_VERSION) $(DESTDIR)$(PREFIX)/lib/$(OUT_MAJOR)
+-	$(LN_S) $(OUT_VERSION) $(DESTDIR)$(PREFIX)/lib/$(OUT_BASE)
++	../install-sh -m 0644 -t $(DESTDIR)$(LIBDIR)/ $(PRIVLIBDIR)/$(TARGET).a
++	../install-sh -m 0755 -t $(DESTDIR)$(LIBDIR)/ $(PRIVLIBDIR)/$(OUT_VERSION)
++	$(RM) $(DESTDIR)$(LIBDIR)/$(OUT_MAJOR)
++	$(RM) $(DESTDIR)$(LIBDIR)/$(OUT_BASE)
++	$(LN_S) $(OUT_VERSION) $(DESTDIR)$(LIBDIR)/$(OUT_MAJOR)
++	$(LN_S) $(OUT_VERSION) $(DESTDIR)$(LIBDIR)/$(OUT_BASE)
+ 	../install-sh -m 0644 -t $(DESTDIR)$(PREFIX)/include/libkarma/ $(INST_HEADERS)
+ 
+ uninstall:
+-	$(RM) $(PREFIX)/lib/$(TARGET).a $(PREFIX)/lib/$(OUT_MAJOR) $(PREFIX)/lib/$(OUT_BASE) $(PREFIX)/lib/$(OUT_VERSION)
++	$(RM) $(LIBDIR)/$(TARGET).a $(LIBDIR)/$(OUT_MAJOR) $(LIBDIR)/$(OUT_BASE) $(LIBDIR)/$(OUT_VERSION)
+ 	$(RM) -r $(PREFIX)/include/libkarma
+ 
+ OBJS = $(SRCS:.c=.o)
+ 
+-$(LIBDIR):
+-	@[ -d $(LIBDIR) ] || mkdir -p $(LIBDIR) > /dev/null 2>&1
++$(PRIVLIBDIR):
++	@[ -d $(PRIVLIBDIR) ] || mkdir -p $(PRIVLIBDIR) > /dev/null 2>&1
+ 
+-$(LIBDIR)/$(TARGET).a: $(OBJS) $(LIBDIR)
+-	$(AR) r $(LIBDIR)/$(TARGET).a $(OBJS)
+-	$(RANLIB) $(LIBDIR)/$(TARGET).a
++$(PRIVLIBDIR)/$(TARGET).a: $(OBJS) $(PRIVLIBDIR)
++	$(AR) r $(PRIVLIBDIR)/$(TARGET).a $(OBJS)
++	$(RANLIB) $(PRIVLIBDIR)/$(TARGET).a
+ 
+-$(LIBDIR)/$(OUT_VERSION): $(OBJS) $(LIBDIR)
+-	$(CC) $(LDFLAGS) $(OBJS) $(CFLAGS) -o $(LIBDIR)/$(OUT_VERSION) $(LIBS)
++$(PRIVLIBDIR)/$(OUT_VERSION): $(OBJS) $(PRIVLIBDIR)
++	$(CC) $(LDFLAGS) $(OBJS) $(CFLAGS) -o $(PRIVLIBDIR)/$(OUT_VERSION) $(LIBS)
+ 
+-$(LIBDIR)/$(OUT_MAJOR): $(LIBDIR)/$(OUT_VERSION) $(LIBDIR)
+-	$(LN_S) $(OUT_VERSION) $(LIBDIR)/$(OUT_MAJOR)
++$(PRIVLIBDIR)/$(OUT_MAJOR): $(PRIVLIBDIR)/$(OUT_VERSION) $(PRIVLIBDIR)
++	$(LN_S) $(OUT_VERSION) $(PRIVLIBDIR)/$(OUT_MAJOR)
+ 
+-$(LIBDIR)/$(OUT_BASE): $(LIBDIR)/$(OUT_VERSION) $(LIBDIR)
+-	$(LN_S) $(OUT_VERSION) $(LIBDIR)/$(OUT_BASE)
++$(PRIVLIBDIR)/$(OUT_BASE): $(PRIVLIBDIR)/$(OUT_VERSION) $(PRIVLIBDIR)
++	$(LN_S) $(OUT_VERSION) $(PRIVLIBDIR)/$(OUT_BASE)
+ 
+-shared-lib-stamp: $(LIBDIR)/$(OUT_VERSION) $(LIBDIR)/$(OUT_MAJOR) $(LIBDIR)/$(OUT_BASE)
++shared-lib-stamp: $(PRIVLIBDIR)/$(OUT_VERSION) $(PRIVLIBDIR)/$(OUT_MAJOR) $(PRIVLIBDIR)/$(OUT_BASE)
+ 	touch $@
+ 
+-static-lib-stamp: $(LIBDIR)/$(TARGET).a
++static-lib-stamp: $(PRIVLIBDIR)/$(TARGET).a
+ 	touch $@
+ 
+ all: static-lib-stamp shared-lib-stamp
+@@ -81,4 +82,4 @@ all: static-lib-stamp shared-lib-stamp
+ .PHONY: clean
+ 
+ clean:
+-	rm -rf $(OBJS) $(LIBDIR)/ static-lib-stamp shared-lib-stamp
++	rm -rf $(OBJS) $(PRIVLIBDIR)/ static-lib-stamp shared-lib-stamp
+--- libkarma-0.1.2/Makefile.pld	2012-03-20 16:33:15.268101678 +0100
++++ libkarma-0.1.2/Makefile	2012-03-20 16:33:45.251272580 +0100
+@@ -16,10 +16,10 @@ DISTFILES= $(LK_SRC)/{Jamfile,Makefile,*
+ 	install-sh karma-tools.spec
+ DOCS=THANKS TODO ChangeLog
+ 
+-INSTALL_DIR     := $(INSTALL) -d -o root -g root -m 0755
+-INSTALL_FILE    := $(INSTALL)    -o root -g root -m 0644
+-INSTALL_PROGRAM := $(INSTALL)    -o root -g root -m 0755
+-INSTALL_SCRIPT  := $(INSTALL)    -o root -g root -m 0755
++INSTALL_DIR     := $(INSTALL) -d -m 0755
++INSTALL_FILE    := $(INSTALL)    -m 0644
++INSTALL_PROGRAM := $(INSTALL)    -m 0755
++INSTALL_SCRIPT  := $(INSTALL)    -m 0755
+ 
+ all: libkarma tools karma-sharp
+ 
+--- libkarma-0.1.2/karma-sharp/Makefile.pld	2012-03-20 16:51:01.878990019 +0100
++++ libkarma-0.1.2/karma-sharp/Makefile	2012-03-20 16:52:10.381952240 +0100
+@@ -27,9 +27,9 @@ karma-sharp.pc: FORCE
+ ifdef HAS_MONO
+ install: $(ASSEMBLY) karma-sharp.pc $(ASSEMBLY).config
+ 	../install-sh -d $(DESTDIR)$(PREFIX)/lib/karma-sharp
+-	../install-sh -d $(DESTDIR)$(PREFIX)/lib/pkgconfig
++	../install-sh -d $(DESTDIR)$(LIBDIR)/pkgconfig
+ 	../install-sh -t $(DESTDIR)$(PREFIX)/lib/karma-sharp $(ASSEMBLY) $(ASSEMBLY).config
+-	../install-sh -t $(DESTDIR)$(PREFIX)/lib/pkgconfig -m 0644 karma-sharp.pc
++	../install-sh -t $(DESTDIR)$(LIBDIR)/pkgconfig -m 0644 karma-sharp.pc
+ else
+ install:
+ 
+@@ -37,7 +37,7 @@ endif
+ 
+ uninstall: FORCE
+ 	$(RM) -r $(PREFIX)/lib/karma-sharp
+-	$(RM) $(PREFIX)/lib/pkgconfig/karma-sharp.pc
++	$(RM) $(LIBDIR)/pkgconfig/karma-sharp.pc
+ 
+ $(ASSEMBLY): $(ASSEMBLY_SOURCES) $(ASSEMBLY_RESOURCES)
+ 	$(MCS) $(MCS_FLAGS) -unsafe -target:library -out:$@ $(ASSEMBLY_SOURCES) $(ASSEMBLY_RESOURCES:%=-resource:%) -r:Mono.Posix
+--- libkarma-0.1.2/tools/Makefile.pld	2011-03-26 10:23:43.000000000 +0100
++++ libkarma-0.1.2/tools/Makefile	2012-03-20 16:48:17.476547330 +0100
+@@ -1,16 +1,16 @@
+ INCLUDES=-I../src
+-LIBDIR=../lib
+-LIBKARMA=$(LIBDIR)/libkarma.a
++PRIVLIBDIR=../lib
++LIBKARMA=$(PRIVLIBDIR)/libkarma.a
+ ifeq ($(MAKECMDGOALS),static)
+-  LIBKARMA=$(LIBDIR)/libkarma.a
++  LIBKARMA=$(PRIVLIBDIR)/libkarma.a
+   LKARMA=$(LIBKARMA)
+ else
+   PLATFORM=$(shell uname)
+   ifeq ($(PLATFORM),Darwin)
+   LDFLAGS+=-liconv
+-  LIBKARMA=$(LIBDIR)/libkarma.dynlib
++  LIBKARMA=$(PRIVLIBDIR)/libkarma.dynlib
+   else
+-  LIBKARMA=$(LIBDIR)/libkarma.so
++  LIBKARMA=$(PRIVLIBDIR)/libkarma.so
+   endif
+   LKARMA=-lkarma
+ endif
+@@ -19,7 +19,7 @@ SRCS=pathedit.c
+ 
+ CC?=gcc
+ CFLAGS+=-Wall -pedantic
+-LDFLAGS+=-ltag_c -lz -L $(LIBDIR)
++LDFLAGS+=-ltag_c -lz -L $(PRIVLIBDIR)
+ 
+ OBJS=$(SRCS:.c=.o)
+ TOOLS=riocp chprop karma_helper
