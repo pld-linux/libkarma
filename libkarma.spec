@@ -1,4 +1,3 @@
-%include	/usr/lib/rpm/macros.mono
 Summary:	Rio Karma access library
 Name:		libkarma
 Version:	0.1.2
