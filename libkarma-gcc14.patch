@@ -1,0 +1,31 @@
+--- libkarma-0.1.2/src/karma.c.orig	2011-03-26 10:23:43.000000000 +0100
++++ libkarma-0.1.2/src/karma.c	2026-03-15 02:05:35.136571351 +0100
+@@ -29,16 +29,14 @@
+ #ifdef __USE_ISOC99
+ #define set_usb_ptr(x) .lk_karma_ ##x = lk_karmaUsb_ ##x
+ #define set_lan_ptr(x) .lk_karma_ ##x = lk_karmaLan_ ##x
+-#define set_unimpl(x) .lk_karma_ ##x = unimpl
+-#define set_unimpl_cast(x,y) (y) unimpl
++#define set_unimpl(x) .lk_karma_ ##x = (typeof(((struct lk_ops *)0)->lk_karma_ ##x)) (void (*)(void)) unimpl
+ #else
+ #define set_usb_ptr(x) lk_karmaUsb_ ##x
+ #define set_lan_ptr(x) lk_karmaLan_ ##x
+-#define set_unimpl(x) unimpl
+-#define set_unimpl_cast(x,y) (y) unimpl
++#define set_unimpl(x) (typeof(((struct lk_ops *)0)->lk_karma_ ##x)) (void (*)(void)) unimpl
+ #endif
+ 
+-static int unimpl()
++static int unimpl(void)
+ {
+     lk_errors_set(E_UNIMPLEM);
+     return 0;
+@@ -68,7 +66,7 @@
+     set_unimpl(format_storage),
+     set_unimpl(device_operation),
+     set_usb_ptr(load_database),
+-    set_unimpl_cast(update_database, void (*)()),
++    set_unimpl(update_database),
+     set_usb_ptr(write_smalldb),
+     set_usb_ptr(fidToPath),
+ };

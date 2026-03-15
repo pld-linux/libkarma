@@ -1,12 +1,14 @@
 Summary:	Rio Karma access library
 Name:		libkarma
 Version:	0.1.2
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://www.freakysoft.de/libkarma/%{name}-%{version}.tar.gz
 # Source0-md5:	2fe636b011dca1cd2a78cd189b891ed8
 Patch0:		%{name}-makefile.patch
+Patch1:		%{name}-gcc14.patch
+Patch2:		%{name}-mcs.patch
 URL:		http://www.freakysoft.de/libkarma/
 BuildRequires:	mono-csharp
 BuildRequires:	taglib-devel
@@ -69,8 +71,12 @@ Pliki programistyczne karma#.
 %prep
 %setup -q
 %patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 
 %build
+CFLAGS="%{rpmcflags}" \
+LDFLAGS="%{rpmldflags}" \
 %{__make} -j1 \
 	CC="%{__cc}"
 

@@ -1,0 +1,10 @@
+--- libkarma-0.1.2/karma-sharp/Makefile.orig	2011-03-26 10:23:43.000000000 +0100
++++ libkarma-0.1.2/karma-sharp/Makefile	2026-03-15 02:06:56.935267208 +0100
+@@ -1,6 +1,6 @@
+ ASSEMBLY_SOURCES=Song.cs Device.cs
+ ASSEMBLY_RESOURCES=
+-MCS=$(shell which gmcs)
++MCS=$(shell which mcs)
+ MCS_FLAGS = -debug
+ 
+ ifeq ($(MCS),)
