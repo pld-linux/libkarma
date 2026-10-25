@@ -1,7 +1,7 @@
 Summary:	Rio Karma access library
 Name:		libkarma
 Version:	0.1.2
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://www.freakysoft.de/libkarma/%{name}-%{version}.tar.gz
